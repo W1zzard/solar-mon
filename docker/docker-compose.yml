@@ -1,0 +1,30 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - monitoring
+    volumes:
+      - prometheus-data:/prometheus/data
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel,savantly-heatmap-panel,grafana-piechart-panel,grafana-clock-panel
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  grafana-data:
+  prometheus-data:
