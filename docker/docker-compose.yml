@@ -12,6 +12,8 @@ services:
     image: grafana/grafana
     environment:
       - GF_INSTALL_PLUGINS=grafana-worldmap-panel,savantly-heatmap-panel,grafana-piechart-panel,grafana-clock-panel
+      - GF_AUTH_TOKEN_ROTATION_INTERVAL_MINUTES=43200
+      - GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DAYS=30
     depends_on:
       - prometheus
     networks:

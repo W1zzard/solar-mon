@@ -15,8 +15,8 @@ WebServer server(80);
 String readString;
 
 const int led = 2;
-const char *ssid = "ssid"; //ssid of wifi spot to use
-const char *password = "passhere"; //password of wifi spot
+const char *ssid = ""; //ssid of wifi spot to use
+const char *password = ""; //password of wifi spot
 
 AverageValue tempInnerAvg, tempOuterAvg;
 
@@ -26,7 +26,6 @@ void setup() {
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
     }
     blinkLed(1);
     delay(1000);
@@ -132,20 +131,20 @@ void blinkLed(int times) {
 void handleMetrics() {
     readTempIntoAvg();
     String response =
-            createMetric("solarpanel_voltage", readSPVoltage())
-            + createMetric("solarpanel_current", readSPCurrent())
-            + createMetric("solarpanel_power", readSPPower())
-            + createMetric("batterycharge_voltage", readBattVoltage())
-            + createMetric("batterycharge_current", readBattChargeCurrent())
-            + createMetric("temp_inner", tempInnerAvg.getValue())
-            + createMetric("temp_external", tempOuterAvg.getValue());
+            createMetric("mpptcharger_solarpanel_volts", "", readSPVoltage())
+            + createMetric("mpptcharger_solarpanel_amperes", "", readSPCurrent())
+            + createMetric("mpptcharger_solarpanel_watts", "", readSPPower())
+            + createMetric("mpptcharger_batterycharge_volts", "", readBattVoltage())
+            + createMetric("mpptcharger_batterycharge_amperes", "", readBattChargeCurrent())
+            + createMetric("mpptcharger_temp_celsius", ",place=\"inner\"", tempInnerAvg.getValue())
+            + createMetric("mpptcharger_temp_celsius", ",place=\"external\"", tempOuterAvg.getValue());
 
     server.send(200, "text/plain", response);
 }
 
-String createMetric(String metricName, double value) {
+String createMetric(String metricName, String params, double value) {
     return "#HELP " + metricName + " metric " + metricName + "\n"
            + "#TYPE " + metricName + " gauge" + "\n"
-           + metricName + "{instance=\"arduino\",job=\"solar\"} " + String(value, 2) + "\n";
+           + metricName + "{instance=\"arduino\",job=\"solar\"" + params + "} " + String(value, 2) + "\n";
 }
 
